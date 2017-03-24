@@ -3,15 +3,47 @@
 
     angular
         .module('ng.locale', [])
+        .value('ngLocaleLocal', {
+            url: null,
+            setUrl: function (url) {
+                this.url = url;
+            }
+        })
+        .value('ngLocaleRest', {
+            url: null,
+            setUrl: function (url) {
+                this.url = url;
+            }
+        })
+        .value('ngLocaleStorage', {
+            isLocalStorage: false,
+            setLocalStorage: function (bool) {
+                this.isLocalStorage = bool;
+            }
+        })
         .factory('ngLocaleService', ngLocaleService)
         .directive('ngLocale', ['ngLocaleService', ngLocale])
         .filter('localize', localize);
 
-    ngLocaleService.$inject = ['$http', '$q'];
+    ngLocaleService.$inject = ['$http', '$q', 'ngLocaleLocal', 'ngLocaleRest'];
 
     function ngLocaleService($http, $q) {
-        var url = 'http://localhost:3004/locale';
-        var locale = $http.get(url);
+        var locale;
+        if (ngLocaleRest.url) {
+            locale = $http.get(ngLocaleRest.url).then(function (restRes) {
+                if (ngLocaleLocal.url) {
+                    return $http.get(ngLocaleLocal.url).then(function (localRes) {
+                        return Object.assign({}, localRes, restRes);
+                    });
+                } else {
+                    return restRes;
+                }
+            });
+        } else if (ngLocaleLocal.url) {
+            locale = $http.get(ngLocaleLocal.url);
+        } else {
+            throw "Can't find locale url's configuration";
+        }
 
         return {
             getLocale: getLocale
@@ -46,7 +78,6 @@
     function localize (ngLocaleService) {
         var cached = {};
         function detailsFilter(input) {
-            // console.log('details for', input);
             if (input) {
                 if (input in cached) {
                     // avoid returning a promise!
@@ -55,7 +86,6 @@
                 } else {
                     ngLocaleService.getLocale(input).then(function (info) {
                         cached[input] = info;
-                        // console.log('generated result for', info);
                     });
                 }
             }
