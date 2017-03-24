@@ -33,7 +33,8 @@
             locale = $http.get(ngLocaleRest.url).then(function (restRes) {
                 if (ngLocaleLocal.url) {
                     return $http.get(ngLocaleLocal.url).then(function (localRes) {
-                        return Object.assign({}, localRes, restRes);
+                        var data = Object.assign({}, localRes.data, restRes.data);
+                        return {data: data};
                     });
                 } else {
                     return restRes;
