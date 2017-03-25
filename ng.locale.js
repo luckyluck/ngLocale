@@ -9,7 +9,8 @@
                 localUrl: null,
                 restUrl: null,
                 prefix: null,
-                toStore: false
+                toStore: false,
+                storageName: 'localeStorage'
             },
             setConfig: function (config) {
                 this.config = Object.assign({}, this.config, config);
@@ -20,43 +21,71 @@
         .directive('ngLocale', ['ngLocaleService', ngLocale])
         .filter('localize', localize);
 
-    ngLocaleService.$inject = ['$http', '$q', 'ngLocaleConfig'];
+    ngLocaleService.$inject = ['$http', '$q', '$window', 'ngLocaleConfig'];
 
-    function ngLocaleService($http, $q, ngLocaleConfig) {
+    function ngLocaleService($http, $q, ngLocaleConfig, $window) {
         var locale;
+        var storage = (typeof window.localStorage === 'undefined') ? undefined : window.localStorage,
+            supported = !(typeof storage === undefined || typeof window.JSON === undefined);
 
-        if (ngLocaleConfig.config.restUrl) {
-            locale = $http.get(ngLocaleConfig.config.restUrl).then(function (restRes) {
-                if (ngLocaleConfig.config.localUrl) {
-                    return $http.get(ngLocaleConfig.config.localUrl).then(function (localRes) {
-                        var data = Object.assign({}, localRes.data, restRes.data);
-                        if (ngLocaleConfig.config.toStore) {
-                            // TODO save to local storage
-                        }
-                        return {data: data};
-                    });
-                } else {
-                    return restRes;
-                }
-            });
-        } else if (ngLocaleConfig.config.localUrl) {
-            locale = $http.get(ngLocaleConfig.config.localUrl);
-        } else {
-            console.log("Make sure  you correctly configured ngLocale");
+        if (!get()) {
+            if (ngLocaleConfig.config.restUrl) {
+                locale = $http.get(ngLocaleConfig.config.restUrl).then(function (restRes) {
+                    if (ngLocaleConfig.config.localUrl) {
+                        return $http.get(ngLocaleConfig.config.localUrl).then(function (localRes) {
+                            var data = Object.assign({}, localRes.data, restRes.data);
+                            if (ngLocaleConfig.config.toStore) {
+                                set(null, data);
+                            }
+                            return {data: data};
+                        });
+                    } else {
+                        return restRes;
+                    }
+                });
+            } else if (ngLocaleConfig.config.localUrl) {
+                locale = $http.get(ngLocaleConfig.config.localUrl);
+            } else {
+                console.log("Make sure  you correctly configured ngLocale");
+            }
         }
 
         return {
-            getLocale: getLocale
+            $$getLocale: getLocale
         };
 
         function getLocale(key) {
             var deferred = $q.defer();
-            locale.then(function (response) {
-                var newKey = ngLocaleConfig.config.prefix ? ngLocaleConfig.config.prefix + '.' + key : key;
-                deferred.resolve(response ? response.data[newKey] : '');
-            });
+
+            var newKey = ngLocaleConfig.config.prefix ? ngLocaleConfig.config.prefix + '.' + key : key;
+            var data = get();
+            if (data) {
+                deferred.resolve(data ? data[newKey] : '');
+            } else {
+                locale.then(function (response) {
+                    deferred.resolve(response ? response.data[newKey] : '');
+                });
+            }
 
             return deferred.promise;
+        }
+
+        function set(name, val) {
+            if (!supported) {
+                console.log('localStorage not supported, make sure you have the $cookies supported.');
+            }
+
+            var storageName = name || ngLocaleConfig.config.storageName;
+            return $window.localStorage && $window.localStorage.setItem(storageName, angular.toJson(val));
+        }
+
+        function get(name) {
+            if (!supported) {
+                console.log('localStorage not supported, make sure you have the $cookies supported.');
+            }
+
+            var storageName = name || ngLocaleConfig.config.storageName;
+            return $window.localStorage && angular.fromJson($window.localStorage.getItem(storageName));
         }
     }
 
@@ -67,7 +96,7 @@
             restrict: 'A',
             link: function (scope, element, attrs) {
 
-                ngLocaleService.getLocale(attrs.ngLocale).then(function (response) {
+                ngLocaleService.$$getLocale(attrs.ngLocale).then(function (response) {
                     element.html(response);
                 });
             }
@@ -85,7 +114,7 @@
                     return typeof cached[input].then !== 'function' ?
                         cached[input] : undefined;
                 } else {
-                    ngLocaleService.getLocale(input).then(function (info) {
+                    ngLocaleService.$$getLocale(input).then(function (info) {
                         cached[input] = info;
                     });
                 }
