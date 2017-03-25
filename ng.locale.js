@@ -21,13 +21,19 @@
                 this.isLocalStorage = bool;
             }
         })
+        .value('ngLocalePrefix', {
+            prefix: null,
+            setPrefix: function (prefix) {
+                this.prefix = prefix;
+            }
+        })
         .factory('ngLocaleService', ngLocaleService)
         .directive('ngLocale', ['ngLocaleService', ngLocale])
         .filter('localize', localize);
 
-    ngLocaleService.$inject = ['$http', '$q', 'ngLocaleLocal', 'ngLocaleRest'];
+    ngLocaleService.$inject = ['$http', '$q', 'ngLocaleLocal', 'ngLocaleRest', 'ngLocalePrefix'];
 
-    function ngLocaleService($http, $q) {
+    function ngLocaleService($http, $q, ngLocaleLocal, ngLocaleRest, ngLocalePrefix) {
         var locale;
         if (ngLocaleRest.url) {
             locale = $http.get(ngLocaleRest.url).then(function (restRes) {
@@ -53,7 +59,8 @@
         function getLocale(key) {
             var deferred = $q.defer();
             locale.then(function (response) {
-                deferred.resolve(response ? response.data[key] : '');
+                var newKey = ngLocalePrefix.prefix ? ngLocalePrefix.prefix + '.' + key : key;
+                deferred.resolve(response ? response.data[newKey] : '');
             });
 
             return deferred.promise;
