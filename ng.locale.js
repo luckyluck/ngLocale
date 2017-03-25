@@ -3,53 +3,45 @@
 
     angular
         .module('ng.locale', [])
-        .value('ngLocaleLocal', {
-            url: null,
-            setUrl: function (url) {
-                this.url = url;
-            }
-        })
-        .value('ngLocaleRest', {
-            url: null,
-            setUrl: function (url) {
-                this.url = url;
-            }
-        })
-        .value('ngLocaleStorage', {
-            isLocalStorage: false,
-            setLocalStorage: function (bool) {
-                this.isLocalStorage = bool;
-            }
-        })
-        .value('ngLocalePrefix', {
-            prefix: null,
-            setPrefix: function (prefix) {
-                this.prefix = prefix;
+        .value('ngLocaleConfig', {
+            config: {
+                localUrl: null,
+                restUrl: null,
+                prefix: null,
+                toStore: false
+            },
+            setConfig: function (config) {
+                this.config = Object.assign({}, this.config, config);
+                console.log('this.config - ', this.config);
             }
         })
         .factory('ngLocaleService', ngLocaleService)
         .directive('ngLocale', ['ngLocaleService', ngLocale])
         .filter('localize', localize);
 
-    ngLocaleService.$inject = ['$http', '$q', 'ngLocaleLocal', 'ngLocaleRest', 'ngLocalePrefix'];
+    ngLocaleService.$inject = ['$http', '$q', 'ngLocaleConfig'];
 
-    function ngLocaleService($http, $q, ngLocaleLocal, ngLocaleRest, ngLocalePrefix) {
+    function ngLocaleService($http, $q, ngLocaleConfig) {
         var locale;
-        if (ngLocaleRest.url) {
-            locale = $http.get(ngLocaleRest.url).then(function (restRes) {
-                if (ngLocaleLocal.url) {
-                    return $http.get(ngLocaleLocal.url).then(function (localRes) {
+
+        if (ngLocaleConfig.config.restUrl) {
+            locale = $http.get(ngLocaleConfig.config.restUrl).then(function (restRes) {
+                if (ngLocaleConfig.config.localUrl) {
+                    return $http.get(ngLocaleConfig.config.localUrl).then(function (localRes) {
                         var data = Object.assign({}, localRes.data, restRes.data);
+                        if (ngLocaleConfig.config.toStore) {
+                            // TODO save to local storage
+                        }
                         return {data: data};
                     });
                 } else {
                     return restRes;
                 }
             });
-        } else if (ngLocaleLocal.url) {
-            locale = $http.get(ngLocaleLocal.url);
+        } else if (ngLocaleConfig.config.localUrl) {
+            locale = $http.get(ngLocaleConfig.config.localUrl);
         } else {
-            throw "Can't find locale url's configuration";
+            console.log("Make sure  you correctly configured ngLocale");
         }
 
         return {
@@ -59,7 +51,7 @@
         function getLocale(key) {
             var deferred = $q.defer();
             locale.then(function (response) {
-                var newKey = ngLocalePrefix.prefix ? ngLocalePrefix.prefix + '.' + key : key;
+                var newKey = ngLocaleConfig.config.prefix ? ngLocaleConfig.config.prefix + '.' + key : key;
                 deferred.resolve(response ? response.data[newKey] : '');
             });
 
