@@ -10,11 +10,11 @@
                 restUrl: null,
                 prefix: null,
                 toStore: false,
-                storageName: 'localeStorage'
+                storageName: 'localeStorage',
+                storeTime: 1800000 // default store time 30 minutes. set to zero if want it forever
             },
             setConfig: function (config) {
                 this.config = Object.assign({}, this.config, config);
-                console.log('this.config - ', this.config);
             }
         })
         .factory('ngLocaleService', ngLocaleService)
@@ -33,9 +33,13 @@
                 locale = $http.get(ngLocaleConfig.config.restUrl).then(function (restRes) {
                     if (ngLocaleConfig.config.localUrl) {
                         return $http.get(ngLocaleConfig.config.localUrl).then(function (localRes) {
-                            var data = Object.assign({}, localRes.data, restRes.data);
+                            var data = Object.assign(
+                                {_createDate: new Date().getTime()},
+                                localRes.data,
+                                restRes.data
+                            );
                             if (ngLocaleConfig.config.toStore) {
-                                set(null, data);
+                                set(data);
                             }
                             return {data: data};
                         });
@@ -70,22 +74,39 @@
             return deferred.promise;
         }
 
-        function set(name, val) {
+        function set(val) {
             if (!supported) {
                 console.log('localStorage not supported, make sure you have the $cookies supported.');
             }
 
-            var storageName = name || ngLocaleConfig.config.storageName;
-            return $window.localStorage && $window.localStorage.setItem(storageName, angular.toJson(val));
+            return $window.localStorage && $window.localStorage.setItem(ngLocaleConfig.config.storageName, angular.toJson(val));
         }
 
-        function get(name) {
+        function get() {
             if (!supported) {
                 console.log('localStorage not supported, make sure you have the $cookies supported.');
             }
 
-            var storageName = name || ngLocaleConfig.config.storageName;
-            return $window.localStorage && angular.fromJson($window.localStorage.getItem(storageName));
+            var data = $window.localStorage && angular.fromJson($window.localStorage.getItem(ngLocaleConfig.config.storageName));
+            if ((!data || isTimeExpired(data._createDate)) && ngLocaleConfig.config.storeTime > 0) {
+                remove();
+                return null;
+            }
+            return data;
+        }
+
+        function remove() {
+            if (!supported) {
+                console.log('localStorage not supported, make sure you have the $cookies supported.');
+            }
+
+            return $window.localStorage && $window.localStorage.removeItem(ngLocaleConfig.config.storageName);
+        }
+
+        function isTimeExpired(createdDate) {
+            var currentTime = new Date().getTime();
+
+            return currentTime - createdDate >= ngLocaleConfig.config.storeTime;
         }
     }
 
