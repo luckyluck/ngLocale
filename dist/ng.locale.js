@@ -1,8 +1,8 @@
 ;(function () {
-    
+
     angular
         .module('ng.locale', [])
-        .constant('MODULE_VERSION', '0.2.0')
+        .constant('MODULE_VERSION', '0.2.1')
         .value('ngLocaleConfig', {
             config: {
                 localUrl: null,
@@ -18,5 +18,5 @@
         })
         .run(['ngLocaleService', function (ngLocaleService) {
         }]);
-    
+
 })();
