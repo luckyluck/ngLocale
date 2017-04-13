@@ -1,4 +1,4 @@
-angular.module('ng.locale', [])
+angular.module('ng.locale')
     .filter('localize', localize);
 
 localize.$inject = ['ngLocaleService'];

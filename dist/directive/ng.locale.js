@@ -1,4 +1,4 @@
-angular.module('ng.locale', [])
+angular.module('ng.locale')
     .directive('ngLocale', ['ngLocaleService', ngLocale]);
 
 ngLocale.$inject = ['ngLocaleService'];
