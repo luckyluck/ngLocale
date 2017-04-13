@@ -1,6 +1,6 @@
 {
     "name": "ng.locale",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "Module for AngularJS easy localization.",
     "main": "ng.locale.js",
     "scripts": {
