@@ -21,7 +21,7 @@
 
 })();
 
-angular.module('ng.locale', [])
+angular.module('ng.locale')
     .directive('ngLocale', ['ngLocaleService', ngLocale]);
 
 ngLocale.$inject = ['ngLocaleService'];
@@ -39,7 +39,7 @@ function ngLocale(ngLocaleService) {
     };
 }
 
-angular.module('ng.locale', [])
+angular.module('ng.locale')
     .filter('localize', localize);
 
 localize.$inject = ['ngLocaleService'];
