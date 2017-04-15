@@ -1,7 +1,7 @@
 {
   "name": "ng.locale",
   "version": "0.2.1",
-  "description": "Module for AngularJS easy localization.",
+  "description": "Module for AngularJS easy localization. See more on https://github.com/luckyluck/ngLocale",
   "main": "ng.locale.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
