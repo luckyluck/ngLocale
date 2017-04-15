@@ -2,7 +2,7 @@
 
     angular
         .module('ng.locale', [])
-        .constant('MODULE_VERSION', '0.2.3')
+        .constant('MODULE_VERSION', '0.2.4')
         .value('ngLocaleConfig', {
             config: {
                 localUrl: null,
