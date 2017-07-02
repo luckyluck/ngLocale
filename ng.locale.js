@@ -122,19 +122,42 @@ function ngLocaleService($http, $q, $window, $log, ngLocaleConfig) {
     };
 
     function getLocale(key) {
+        var args = Array.from(arguments);
         var deferred = $q.defer();
-
-        var newKey = ngLocaleConfig.config.prefix ? ngLocaleConfig.config.prefix + '.' + key : key;
-        var data = get();
-        if (data) {
-            deferred.resolve(data[newKey]);
-        } else {
-            locale.then(function (response) {
-                deferred.resolve(response ? response.data[newKey] : '');
-            });
+        if (!key) {
+            deferred.resolve();
+            return deferred.promise;
         }
 
-        return deferred.promise;
+        var prefix = ngLocaleConfig.config.prefix ? ngLocaleConfig.config.prefix + '.' : '';
+        var data = get();
+        if (data) {
+            if (args.length > 1) {
+                var results = {};
+                for (var i = 0, l = args.length; i < l; i++) {
+                    results[args[i]] = data[prefix + args[i]];
+                }
+            } else {
+                deferred.resolve(data[prefix + args[0]]);
+            }
+        } else {
+            locale.then(function (response) {
+                if (!response) {
+                    deferred.resolve();
+                    return deferred.promise;
+                }
+
+                if (args.length > 1) {
+                    var results = {};
+                    for (var i = 0, l = args.length; i < l; i++) {
+                        results[args[i]] = response.data[prefix + args[i]];
+                    }
+                    deferred.resolve(results);
+                } else {
+                    deferred.resolve(response.data[prefix + args[0]]);
+                }
+            });
+        }
     }
 
     function set(val) {

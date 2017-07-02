@@ -51,6 +51,17 @@ ngLocaleService.$$getLocale('locale_key').then(function (response) {
 ```
 If service does not find the value for your key, it will return `empty string` as a result.
 
+Also, if you need to localize more than one key, you should just add all of them as parameters:
+```javascript
+var self = this;
+ngLocaleService.$$getLocale('key1', 'key2', 'key3').then(function (response) {
+  self.key1 = response['key1'];
+  self.key2 = response['key2'];
+  self.key3 = response['key3'];
+});
+```
+In that case service will return object, where keys will be your params and values for this keys - localized strings (or `empty string`).
+
 
 If you find bug or you have any idea how to do better, 
 I'll be glad to here about it and to improve ngLocale for you.
