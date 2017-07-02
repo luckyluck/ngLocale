@@ -2,7 +2,7 @@
 
     angular
         .module('ng.locale', [])
-        .constant('MODULE_VERSION', '0.2.4')
+        .constant('MODULE_VERSION', '0.3.5')
         .value('ngLocaleConfig', {
             config: {
                 localUrl: null,
@@ -81,17 +81,17 @@ function ngLocaleService($http, $q, $window, $log, ngLocaleConfig) {
             locale = $http.get(ngLocaleConfig.config.restUrl).then(function (restRes) {
                 if (ngLocaleConfig.config.localUrl) {
                     var data = angular.extend(
-                        {_createDate: new Date().getTime()},
+                        { _createDate: new Date().getTime() },
                         restRes.data
                     );
                     if (ngLocaleConfig.config.toStore) {
                         set(data);
                     }
-                    return {data: data};
+                    return { data: data };
                 }
                 locale = $http.get(ngLocaleConfig.config.localUrl).then(function (localRes) {
                     var data = angular.extend(
-                        {_createDate: new Date().getTime()},
+                        { _createDate: new Date().getTime() },
                         localRes.data,
                         restRes.data
                     );
@@ -104,7 +104,7 @@ function ngLocaleService($http, $q, $window, $log, ngLocaleConfig) {
         } else if (ngLocaleConfig.config.localUrl) {
             locale = $http.get(ngLocaleConfig.config.localUrl).then(function (localRes) {
                 var data = angular.extend(
-                    {_createDate: new Date().getTime()},
+                    { _createDate: new Date().getTime() },
                     localRes.data
                 );
                 if (ngLocaleConfig.config.toStore) {
@@ -158,6 +158,7 @@ function ngLocaleService($http, $q, $window, $log, ngLocaleConfig) {
                 }
             });
         }
+        return deferred.promise;
     }
 
     function set(val) {

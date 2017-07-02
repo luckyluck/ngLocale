@@ -90,6 +90,7 @@ function ngLocaleService($http, $q, $window, $log, ngLocaleConfig) {
                 }
             });
         }
+        return deferred.promise;
     }
 
     function set(val) {
