@@ -2,7 +2,7 @@
 
     angular
         .module('ng.locale', [])
-        .constant('MODULE_VERSION', '0.3.6')
+        .constant('MODULE_VERSION', '0.3.7')
         .value('ngLocaleConfig', {
             config: {
                 localUrl: null,
@@ -52,7 +52,7 @@ function localize(ngLocaleService) {
         if (input) {
             if (input in cached) {
                 // avoid returning a promise!
-                return typeof cached[input].then !== 'function' ?
+                return angular.isDefined(cached[input]) && typeof cached[input].then !== 'function' ?
                     cached[input] : undefined;
             } else {
                 ngLocaleService.$get(input).then(function (info) {

@@ -4,14 +4,14 @@ angular.module('ng.locale')
 localize.$inject = ['ngLocaleService'];
 
 function localize(ngLocaleService) {
-    
+
     var cached = {};
-    
+
     function detailsFilter(input) {
         if (input) {
             if (input in cached) {
                 // avoid returning a promise!
-                return typeof cached[input].then !== 'function' ?
+                return angular.isDefined(cached[input]) && typeof cached[input].then !== 'function' ?
                     cached[input] : undefined;
             } else {
                 ngLocaleService.$get(input).then(function (info) {
@@ -20,7 +20,7 @@ function localize(ngLocaleService) {
             }
         }
     }
-    
+
     detailsFilter.$stateful = true;
     return detailsFilter;
 }
