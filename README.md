@@ -28,6 +28,7 @@ ngLocaleConfigProvider.$get('setConfig').setConfig({
 To use module as an attribute you should just write this:
 ```html
 <span ng-locale="locale_key"></span>
+<span ng-locale="{{$scope.localeKey}}"></span>
 ```
 Module will bind localized value to this `span` element.
 If attribute does not find the value for your key, it will return `empty string` as a result (using service).
@@ -45,7 +46,7 @@ If you want to use module in your code, first of all you should add `ngLocaleSer
 Then you can use service like this:
 ```javascript
 var self = this;
-ngLocaleService.$$getLocale('locale_key').then(function (response) {
+ngLocaleService.$$get('locale_key').then(function (response) {
   self.translate = response;
 });
 ```
@@ -54,7 +55,7 @@ If service does not find the value for your key, it will return `empty string` a
 Also, if you need to localize more than one key, you should just add all of them as parameters:
 ```javascript
 var self = this;
-ngLocaleService.$$getLocale('key1', 'key2', 'key3').then(function (response) {
+ngLocaleService.$$get('key1', 'key2', 'key3').then(function (response) {
   self.key1 = response['key1'];
   self.key2 = response['key2'];
   self.key3 = response['key3'];
