@@ -69,6 +69,7 @@ function ngLocaleService($http, $q, $window, $log, ngLocaleConfig) {
                 for (var i = 0, l = args.length; i < l; i++) {
                     results[args[i]] = data[prefix + args[i]];
                 }
+                deferred.resolve(results);
             } else {
                 deferred.resolve(data[prefix + args[0]]);
             }

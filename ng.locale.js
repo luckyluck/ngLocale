@@ -2,7 +2,7 @@
 
     angular
         .module('ng.locale', [])
-        .constant('MODULE_VERSION', '0.3.5')
+        .constant('MODULE_VERSION', '0.3.6')
         .value('ngLocaleConfig', {
             config: {
                 localUrl: null,
@@ -137,6 +137,7 @@ function ngLocaleService($http, $q, $window, $log, ngLocaleConfig) {
                 for (var i = 0, l = args.length; i < l; i++) {
                     results[args[i]] = data[prefix + args[i]];
                 }
+                deferred.resolve(results);
             } else {
                 deferred.resolve(data[prefix + args[0]]);
             }
