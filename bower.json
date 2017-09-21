@@ -1,0 +1,15 @@
+{
+    "name": "ng.locale",
+    "version": "0.3.7",
+    "description": "angularjs localization library",
+    "main": "ng.locale.js",
+    "authors": [
+        "luckyluck <ketov.alex.v@yandex.kz>"
+    ],
+    "license": "MIT",
+    "keywords": [
+        "angularjs",
+        "localization"
+    ],
+    "homepage": "https://github.com/luckyluck/ngLocale"
+}
