@@ -1,17 +1,36 @@
 angular.module('ng.locale')
-    .directive('ngLocale', ['ngLocaleService', ngLocale]);
+    .directive('ngLocale', ['$compile', 'ngLocaleService', ngLocale]);
 
-ngLocale.$inject = ['ngLocaleService'];
+ngLocale.$inject = ['$compile', 'ngLocaleService'];
 
-function ngLocale(ngLocaleService) {
-    
+function ngLocale($compile, ngLocaleService) {
     return {
-        restrict: 'A',
-        link: function (scope, element, attrs) {
+        restrict: 'AC',
+        /*link: function (scope, element, attrs) {
             
-            ngLocaleService.$get(attrs.ngLocale).then(function (response) {
-                element.html(response);
+            // if (attrs.ngLocale) {
+            //     ngLocaleService.$get(attrs.ngLocale).then(function (response) {
+            //         element.textContent = stringify(response);
+            //     });
+            // }
+    
+            scope.$watch(attr.ngLocale, function ngLocaleWatchAction(value) {
+                ngLocaleService.$get(value).then(function (response) {
+                    element.textContent = stringify(response);
+                });
             });
+        }*/
+        compile: function ngLocaleCompile(templateElement) {
+            $compile.$$addBindingClass(templateElement);
+            return function ngLocaleLink(scope, element, attr) {
+                $compile.$$addBindingInfo(element, attr.ngLocale);
+                element = element[0];
+                scope.$watch(attr.ngLocale, function ngBindWatchAction(value) {
+                    ngLocaleService.$get(value).then(function (response) {
+                        element.textContent = stringify(response);
+                    });
+                });
+            };
         }
     };
 }
