@@ -1,9 +1,9 @@
 angular.module('ng.locale')
-    .directive('ngLocale', ['$compile', 'ngLocaleService', ngLocale]);
+    .directive('ngLocale', ['ngLocaleService', ngLocale]);
 
-ngLocale.$inject = ['$compile', 'ngLocaleService'];
+ngLocale.$inject = ['ngLocaleService'];
 
-function ngLocale($compile, ngLocaleService) {
+function ngLocale(ngLocaleService) {
     return {
         restrict: 'AC',
         link: function (scope, element, attrs) {

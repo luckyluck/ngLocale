@@ -9,44 +9,7 @@ function ngLocaleService($http, $q, $window, $log, ngLocaleConfig) {
     var supported = !(angular.isUndefined(window.localStorage) || angular.isUndefined(window.JSON));
 
     if (!get()) {
-        if (ngLocaleConfig.config.restUrl) {
-            locale = $http.get(ngLocaleConfig.config.restUrl).then(function (restRes) {
-                if (ngLocaleConfig.config.localUrl) {
-                    var data = angular.extend(
-                        {_createDate: new Date().getTime()},
-                        restRes.data
-                    );
-                    if (ngLocaleConfig.config.toStore) {
-                        set(data);
-                    }
-                    return {data: data};
-                }
-                locale = $http.get(ngLocaleConfig.config.localUrl).then(function (localRes) {
-                    var data = angular.extend(
-                        {_createDate: new Date().getTime()},
-                        localRes.data,
-                        restRes.data
-                    );
-                    if (ngLocaleConfig.config.toStore) {
-                        set(data);
-                    }
-                    return {data: data};
-                });
-            });
-        } else if (ngLocaleConfig.config.localUrl) {
-            locale = $http.get(ngLocaleConfig.config.localUrl).then(function (localRes) {
-                var data = angular.extend(
-                    {_createDate: new Date().getTime()},
-                    localRes.data
-                );
-                if (ngLocaleConfig.config.toStore) {
-                    set(data);
-                }
-                return {data: data};
-            });
-        } else {
-            throw new Error("Make sure  you correctly configured ngLocale");
-        }
+        init();
     }
 
     return {
@@ -74,6 +37,9 @@ function ngLocaleService($http, $q, $window, $log, ngLocaleConfig) {
                 deferred.resolve(data[prefix + args[0]]);
             }
         } else {
+            if (!locale) {
+                init();
+            }
             locale.then(function (response) {
                 if (!response) {
                     deferred.resolve();
@@ -127,5 +93,46 @@ function ngLocaleService($http, $q, $window, $log, ngLocaleConfig) {
         var currentTime = new Date().getTime();
 
         return currentTime - createdDate >= ngLocaleConfig.config.storeTime;
+    }
+    
+    function init() {
+        if (ngLocaleConfig.config.restUrl) {
+            locale = $http.get(ngLocaleConfig.config.restUrl).then(function (restRes) {
+                if (ngLocaleConfig.config.localUrl) {
+                    var data = angular.extend(
+                        { _createDate: new Date().getTime() },
+                        restRes.data
+                    );
+                    if (ngLocaleConfig.config.toStore) {
+                        set(data);
+                    }
+                    return { data: data };
+                }
+                locale = $http.get(ngLocaleConfig.config.localUrl).then(function (localRes) {
+                    var data = angular.extend(
+                        { _createDate: new Date().getTime() },
+                        localRes.data,
+                        restRes.data
+                    );
+                    if (ngLocaleConfig.config.toStore) {
+                        set(data);
+                    }
+                    return {data: data};
+                });
+            });
+        } else if (ngLocaleConfig.config.localUrl) {
+            locale = $http.get(ngLocaleConfig.config.localUrl).then(function (localRes) {
+                var data = angular.extend(
+                    { _createDate: new Date().getTime() },
+                    localRes.data
+                );
+                if (ngLocaleConfig.config.toStore) {
+                    set(data);
+                }
+                return {data: data};
+            });
+        } else {
+            throw new Error("Make sure  you correctly configured ngLocale");
+        }
     }
 }
