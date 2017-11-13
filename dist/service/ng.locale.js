@@ -13,7 +13,8 @@ function ngLocaleService($http, $q, $window, $log, ngLocaleConfig) {
     }
 
     return {
-        $get: getLocale
+        $get: getLocale,
+        $add: addLocale
     };
 
     function getLocale(key) {
@@ -58,6 +59,15 @@ function ngLocaleService($http, $q, $window, $log, ngLocaleConfig) {
             });
         }
         return deferred.promise;
+    }
+    
+    function addLocale(localeObj) {
+        var data = get();
+        if (data) {
+            set(angular.extend({}, data, localeObj));
+        } else {
+            set(localeObj);
+        }
     }
 
     function set(val) {

@@ -22,6 +22,14 @@ ngLocaleConfigProvider.$get('setConfig').setConfig({
 * `prefix` - if you have a prefix in your localization keys
 * `toStore` - if you want module to store localization in local storage, then you should choose `true` for this option.
 
+Additionally, if you have a need to add something during the work of your application or you want to edit your localization in store, you can do it 
+like that:
+```javascript
+ngLocaleService.$$add(localeObject);
+```
+where
+* `localeObject` - custom object with { key: value } pairs, which will extend your locale object if it exists or just add new values if it does not
+
 ## How to use
 
 **As attribute**
