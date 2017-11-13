@@ -30,6 +30,8 @@ ngLocaleService.$$add(localeObject);
 where
 * `localeObject` - custom object with { key: value } pairs, which will extend your locale object if it exists or just add new values if it does not
 
+It is important to know, that you should not add prefix to your keys, because method will use prefix from the configuration.
+
 ## How to use
 
 **As attribute**
