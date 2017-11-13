@@ -133,10 +133,17 @@ function ngLocaleService($http, $q, $window, $log, ngLocaleConfig) {
     
     function addLocale(localeObj) {
         var data = get();
+        var prefix = ngLocaleConfig.config.prefix ? ngLocaleConfig.config.prefix + '.' : '';
+        var newLocaleObj = {};
+        for (var key in localeObj) {
+            if (localeObj.hasOwnProperty(key)) {
+                newLocaleObj[prefix + key] = localeObj[key];
+            }
+        }
         if (data) {
-            set(angular.extend({}, data, localeObj));
+            set(angular.extend({}, data, newLocaleObj));
         } else {
-            set(localeObj);
+            set(newLocaleObj);
         }
     }
     
