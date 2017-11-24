@@ -8,7 +8,7 @@ function ngLocaleService($http, $q, $window, $log, ngLocaleConfig) {
     var locale;
     var supported = !(angular.isUndefined(window.localStorage) || angular.isUndefined(window.JSON));
 
-    if (!get()) {
+    if (!get() || !get().hasOwnProperty('_createDate')) {
         init();
     }
 
@@ -75,6 +75,7 @@ function ngLocaleService($http, $q, $window, $log, ngLocaleConfig) {
         if (data) {
             set(angular.extend({}, data, newLocaleObj));
         } else {
+            init();
             set(newLocaleObj);
         }
     }
@@ -83,8 +84,11 @@ function ngLocaleService($http, $q, $window, $log, ngLocaleConfig) {
         if (!supported) {
             $log('localStorage not supported, make sure you have the $cookies supported.');
         }
+        
+        var data = get();
+        var newVal = data !== null ? angular.extend({}, data, val) : val;
 
-        return $window.localStorage && $window.localStorage.setItem(ngLocaleConfig.config.storageName, angular.toJson(val));
+        return $window.localStorage && $window.localStorage.setItem(ngLocaleConfig.config.storageName, angular.toJson(newVal));
     }
 
     function get() {
